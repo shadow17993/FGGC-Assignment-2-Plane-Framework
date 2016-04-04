@@ -1,6 +1,6 @@
 #include "ParticleModel.h"
 
-ParticleModel::ParticleModel(Transform* transform, bool useConstVel, XMFLOAT3 initVel, XMFLOAT3 initAccel) : _transform(transform)
+ParticleModel::ParticleModel(Transform* transform, bool useConstVel, XMFLOAT3 initVel, XMFLOAT3 initAccel, float mass) : _transform(transform), _mass(mass)
 {
 	_isConstVel = useConstVel;
 	_isSpinConstVel = true;
@@ -14,13 +14,11 @@ ParticleModel::ParticleModel(Transform* transform, bool useConstVel, XMFLOAT3 in
 	_brake = { 0.0f, 0.0f, 0.0f };
 	_friction = { 0.0f, 0.0f, 0.0f };
 	_netForce = { 0.0f, 0.0f, 0.0f };
-
-	_mass = 1.0f;
 	_gravity = -9.8f;
 	_weight = _mass * _gravity;
 	_initPos = _transform->GetPosition();
 
-	_radius = 1.0f;
+	_radius = 15.0f;
 }
 
 ParticleModel::ParticleModel(Transform* transform, bool useConstVel, XMFLOAT3 initVel, XMFLOAT3 initAccel, XMFLOAT3 thrust) : _transform(transform)
@@ -247,7 +245,12 @@ void ParticleModel::UpdatePlane(float t)
 			_spinVelocity.x += 0.001f;
 		}
 	}
-	_thrust.y = _angle.x / 90 * -_thrust.z;
+	//_thrust.y = _angle.x / 90 * -_thrust.z;
+
+	
+
+	
+
 
 	// Move Plane Left and Right
 	if (GetAsyncKeyState('A'))
@@ -269,6 +272,9 @@ void ParticleModel::UpdatePlane(float t)
 			_spinVelocity.z += 0.0001f;
 		}
 	}
+
+	_thrust.y += _angle.y / 90 * -_thrust.z;
+	//_thrust.y += (_mass * (_velocity.z * _velocity.z) / getRadius());
 	
 
 	if (GetAsyncKeyState('Q'))
@@ -294,13 +300,13 @@ void ParticleModel::UpdatePlane(float t)
 
 	if (GetAsyncKeyState('Z'))
 	{
-		_thrust.z -= 0.00002f;
+		_thrust.z -= _mass * _velocity.z;
+	}
+	else if (GetAsyncKeyState('C'))
+	{
+		_thrust.z += _mass * _velocity.z;
 	}
 
-	if (GetAsyncKeyState('C'))
-	{
-		_thrust.z += 0.00004f;
-	}
 
 	/*if (_transform->GetPosition().y > _initPos.y)
 	{

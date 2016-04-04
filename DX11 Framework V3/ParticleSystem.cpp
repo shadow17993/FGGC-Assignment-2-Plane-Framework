@@ -23,7 +23,7 @@ void ParticleSystem::Update(float dt)
 			Transform* t = new Transform(nullptr, _transform->GetPosition());
 			ParticleModel* pm = new ParticleModel(t, true, { 0.0f, 1.0f, 0.0f },{ 0.0f, 1.0f, 0.0f }, {0.0f, 1.0f, 0.0f});
 			
-			particles.push_back(new Particle(t, pm, getAppearance()));
+			particles.push_back(new Particle(t, pm, _particleApp));
 		}
 	}
 

@@ -78,7 +78,7 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 
 	planeMesh = OBJLoader::Load("OBJ/Hercules.obj", _pd3dDevice, true);
 	terrainMesh = OBJLoader::LoadTerrain(513, 513, 2, 2, true, _pd3dDevice);
-	sphereMesh = OBJLoader::Load("OBJ/sphere.obj", _pd3dDevice, true);
+	sphereMesh = OBJLoader::Load("OBJ/star.obj", _pd3dDevice, true);
 
 	basicLight.AmbientLight = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
 	basicLight.DiffuseLight = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -134,7 +134,7 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 
 	Transform * terrainTransform = new Transform(nullptr, { -200, -30, -200 });
 
-	ParticleModel * particleModel = new ParticleModel(planeTransform, true, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f });
+	ParticleModel * particleModel = new ParticleModel(planeTransform, true, { 0.0f, 0.0f, 0.00001f }, { 0.0f, 0.0f, 0.0f }, 50.0f);
 
 	GameObject* planeObj = new GameObject("Plane", planeTransform, particleModel, planeAppearance);
 	GameObject* terrainObj = new GameObject("Terrain", terrainTransform, terrainAppearance);
@@ -786,7 +786,42 @@ void Application::Draw()
 		gameObject->Draw(_pImmediateContext);
 	}
 
+	cb.World = XMMatrixIdentity();
+	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+
 	_ps->Draw(_pImmediateContext);
+
+	for (auto particles : _ps->getParticles())
+	{
+		// Get render material
+		Material material = particles->GetAppearance()->GetMaterial();
+
+		// Copy material to shader
+		cb.surface.AmbientMtrl = material.ambient;
+		cb.surface.DiffuseMtrl = material.diffuse;
+		cb.surface.SpecularMtrl = material.specular;
+
+		// Set world matrix
+		cb.World = XMMatrixTranspose(particles->GetTransform()->GetWorldMatrix());
+
+		// Set texture
+		if (particles->GetAppearance()->HasTexture())
+		{
+			ID3D11ShaderResourceView * textureRV = particles->GetAppearance()->GetTextureRV();
+			_pImmediateContext->PSSetShaderResources(0, 1, &textureRV);
+			cb.HasTexture = 1.0f;
+		}
+		else
+		{
+			cb.HasTexture = 0.0f;
+		}
+
+		// Update constant buffer
+		_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+
+		// Draw object
+		particles->Draw(_pImmediateContext);
+	}
 
     //
     // Present our back buffer to our front buffer

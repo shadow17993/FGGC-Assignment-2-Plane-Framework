@@ -20,6 +20,7 @@ public:
 
 	Transform* getTransform(){ return _transform; }
 	Appearance* getAppearance(){ return _particleApp; }
+	vector<Particle*> getParticles(){ return particles; }
 
 
 	void Update(float t);
