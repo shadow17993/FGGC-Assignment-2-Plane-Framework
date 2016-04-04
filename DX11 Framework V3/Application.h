@@ -55,10 +55,12 @@ private:
 	
 	MeshData					terrainMesh;
 	MeshData					planeMesh;
+	MeshData					sphereMesh;
 
 	Terrain*					terrainObj;
 
 	vector<GameObject*>			_gameObjects;
+	ParticleSystem*				_ps;
 
 
 	XMFLOAT3 lightDirection = { 0.25f, 0.5f, -1.0f };					// Light direction from surface (XYZ)

@@ -21,7 +21,10 @@ void GameObject::Update(float t)
 
 	if (isMoving)
 	{
-		_particleModel->Update(t);
+		if (_type == "Plane")
+		{
+			_particleModel->UpdatePlane(t);
+		}
 	}
 }
 

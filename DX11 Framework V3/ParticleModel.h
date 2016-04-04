@@ -88,7 +88,7 @@ public:
 
 	void updateState(float t);
 
-	void Update(float t);
+	void UpdatePlane(float t);
 	void UpdateParticle(float t);
 
 	

@@ -210,10 +210,10 @@ void ParticleModel::updateState(float t)
 	moveConstVel(t);
 }
 
-void ParticleModel::Update(float t)
+void ParticleModel::UpdatePlane(float t)
 {
 	_angle.x = XMConvertToDegrees(_transform->GetRotation().x);
-	_angle.y = XMConvertToDegrees(_transform->GetRotation().y);
+	_angle.y = XMConvertToDegrees(-_transform->GetRotation().y);
 	_angle.z = XMConvertToDegrees(_transform->GetRotation().z);
 
 	/*if (GetAsyncKeyState('S'))
@@ -269,17 +269,37 @@ void ParticleModel::Update(float t)
 			_spinVelocity.z += 0.0001f;
 		}
 	}
+	
 
-
+	if (GetAsyncKeyState('Q'))
+	{
+		_spinVelocity.y -= 0.00001f;
+	}
+	else if (GetAsyncKeyState('E'))
+	{
+		_spinVelocity.y += 0.00001f;
+	}
+	else if (_spinVelocity.y >= 0.0f || _spinVelocity.y <= 0.0f)
+	{
+		if (_spinVelocity.y >= 0.0f)
+		{
+			_spinVelocity.y -= 0.0001f;
+		}
+		else
+		{
+			_spinVelocity.y += 0.0001f;
+		}
+	}
+	_thrust.x = _angle.y / 90 * -_thrust.z;
 
 	if (GetAsyncKeyState('Z'))
 	{
-		_thrust.z -= 0.00001f;
+		_thrust.z -= 0.00002f;
 	}
 
 	if (GetAsyncKeyState('C'))
 	{
-		_thrust.z += 0.00001f;
+		_thrust.z += 0.00004f;
 	}
 
 	/*if (_transform->GetPosition().y > _initPos.y)

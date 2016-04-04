@@ -3,7 +3,9 @@
 
 ParticleSystem::ParticleSystem(Transform* transform, XMFLOAT3 offsetPos, Appearance* particleApp) : _transform(transform), _offsetPos(offsetPos), _particleApp(particleApp)
 {
-
+	_transform->SetPosition(_transform->GetPosition().x + offsetPos.x,
+							_transform->GetPosition().y + offsetPos.y,
+							_transform->GetPosition().z + offsetPos.z);
 }
 
 
@@ -15,13 +17,11 @@ void ParticleSystem::Update(float dt)
 {
 	if (particles.size() != 100)
 	{
-		if (rand() % 10 + 1 > 5)
+		/*if (rand() % 10 + 1 > 5)*/
+		if (GetAsyncKeyState('P') & 0x8000)
 		{
 			Transform* t = new Transform(nullptr, _transform->GetPosition());
-			ParticleModel* pm = new ParticleModel(t, true, { -2.0f + static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2.0 - -2.0)), 
-															-2.0f + static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2.0 - -2.0)), 
-															-2.0f + static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2.0 - -2.0)) }, 
-															{ 0.0f, 0.0f, 0.0f }, {0.0f, 1.0f, 0.0f});
+			ParticleModel* pm = new ParticleModel(t, true, { 0.0f, 1.0f, 0.0f },{ 0.0f, 1.0f, 0.0f }, {0.0f, 1.0f, 0.0f});
 			
 			particles.push_back(new Particle(t, pm, getAppearance()));
 		}

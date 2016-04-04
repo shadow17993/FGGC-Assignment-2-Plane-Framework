@@ -78,6 +78,7 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 
 	planeMesh = OBJLoader::Load("OBJ/Hercules.obj", _pd3dDevice, true);
 	terrainMesh = OBJLoader::LoadTerrain(513, 513, 2, 2, true, _pd3dDevice);
+	sphereMesh = OBJLoader::Load("OBJ/sphere.obj", _pd3dDevice, true);
 
 	basicLight.AmbientLight = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
 	basicLight.DiffuseLight = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -99,6 +100,13 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 	terrainGeometry.vertexBufferOffset = terrainMesh.VBOffset;
 	terrainGeometry.vertexBufferStride = terrainMesh.VBStride;
 
+	Geometry sphereGeometry;
+	sphereGeometry.indexBuffer = sphereMesh.IndexBuffer;
+	sphereGeometry.vertexBuffer = sphereMesh.VertexBuffer;;
+	sphereGeometry.numberOfIndices = sphereMesh.IndexCount;
+	sphereGeometry.vertexBufferOffset = sphereMesh.VBOffset;
+	sphereGeometry.vertexBufferStride = sphereMesh.VBStride;
+
 	Material shinyMaterial;
 	shinyMaterial.ambient = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
 	shinyMaterial.diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -117,6 +125,9 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 	Appearance* terrainAppearance = new Appearance(terrainGeometry, shinyMaterial);
 	terrainAppearance->SetTextureRV(_pTextureRV);
 
+	Appearance* sphereAppearance = new Appearance(sphereGeometry, shinyMaterial);
+	terrainAppearance->SetTextureRV(_pTextureRV);
+
 	Transform * planeTransform = new Transform();
 	planeTransform->SetScale(1.0f, 1.0f, 1.0f);
 	planeTransform->SetPosition(cameraMain->GetPosition().x, cameraMain->GetPosition().y - 15.0f, cameraMain->GetPosition().z - 20.0f);
@@ -130,6 +141,10 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 
 	_gameObjects.push_back(planeObj);
 	_gameObjects.push_back(terrainObj);
+
+	Transform * psTransform = new Transform(planeTransform);
+
+	_ps = new ParticleSystem(psTransform, { 0.0f, 0.0f, 10.0f }, sphereAppearance);
 
 	return S_OK;
 }
@@ -551,6 +566,8 @@ void Application::Update()
 	{
 		gameobjects->Update(t);
 	}
+
+	_ps->Update(t);
 }
 
 void Application::getInput(float t)
@@ -607,7 +624,7 @@ void Application::getInput(float t)
 		SideView->Update();*/
 	}
 
-	if (GetAsyncKeyState('Q') & 0x8000)
+	/*if (GetAsyncKeyState('Q') & 0x8000)
 	{
 		cameraMain->SetPosition(cameraMain->GetPosition().x, cameraMain->GetPosition().y, cameraMain->GetPosition().z - 0.1f);
 		cameraMain->SetLookAt(cameraMain->GetLookAt().x, cameraMain->GetLookAt().y, cameraMain->GetLookAt().z - 0.1f);
@@ -631,7 +648,7 @@ void Application::getInput(float t)
 		SideView->SetPosition(SideView->GetPosition().x, SideView->GetPosition().y, SideView->GetPosition().z + 0.1f);
 		SideView->SetLookAt(SideView->GetLookAt().x, SideView->GetLookAt().y, SideView->GetLookAt().z + 0.1f);
 		SideView->Update();
-	}
+	}*/
 
 	if (GetAsyncKeyState('Y') & 0x8000)
 	{
@@ -709,7 +726,7 @@ void Application::Draw()
     //
     // Clear the back buffer
     //
-	float ClearColor[4] = { 0.5f, 0.5f, 0.5f, 1.0f }; // red,green,blue,alpha
+	float ClearColor[4] = { 0.8f, 0.8f, 1.0f, 1.0f }; // red,green,blue,alpha
     _pImmediateContext->ClearRenderTargetView(_pRenderTargetView, ClearColor);
 	_pImmediateContext->ClearDepthStencilView(_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
@@ -768,6 +785,8 @@ void Application::Draw()
 		// Draw object
 		gameObject->Draw(_pImmediateContext);
 	}
+
+	_ps->Draw(_pImmediateContext);
 
     //
     // Present our back buffer to our front buffer
