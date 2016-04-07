@@ -245,7 +245,7 @@ void ParticleModel::UpdatePlane(float t)
 			_spinVelocity.x += 0.001f;
 		}
 	}
-	//_thrust.y = _angle.x / 90 * -_thrust.z;
+	_thrust.y = _angle.x / 90 * -_thrust.z;
 
 	
 
@@ -273,7 +273,7 @@ void ParticleModel::UpdatePlane(float t)
 		}
 	}
 
-	_thrust.y += _angle.y / 90 * -_thrust.z;
+	//_thrust.y += _angle.y / 90 * -_thrust.z;
 	//_thrust.y += (_mass * (_velocity.z * _velocity.z) / getRadius());
 	
 
@@ -300,11 +300,11 @@ void ParticleModel::UpdatePlane(float t)
 
 	if (GetAsyncKeyState('Z'))
 	{
-		_thrust.z -= _mass * _velocity.z;
+		_thrust.z -= /*_mass * _velocity.z*/ 0.00001f;
 	}
 	else if (GetAsyncKeyState('C'))
 	{
-		_thrust.z += _mass * _velocity.z;
+		_thrust.z += /*_mass * _velocity.z*/ 0.00001f;
 	}
 
 

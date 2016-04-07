@@ -15,16 +15,19 @@ ParticleSystem::~ParticleSystem()
 
 void ParticleSystem::Update(float dt)
 {
+	_transform->Update(dt);
+	//_transform->SetPosition(_transform->getParent()->GetPosition().x, _transform->getParent()->GetPosition().y, _transform->getParent()->GetPosition().z + 13);
+	
+
 	if (particles.size() != 100)
 	{
-		/*if (rand() % 10 + 1 > 5)*/
-		if (GetAsyncKeyState('P') & 0x8000)
-		{
-			Transform* t = new Transform(nullptr, _transform->GetPosition());
-			ParticleModel* pm = new ParticleModel(t, true, { 0.0f, 1.0f, 0.0f },{ 0.0f, 1.0f, 0.0f }, {0.0f, 1.0f, 0.0f});
+		Transform* t = new Transform(nullptr, _transform->GetPosition(), { 0.0f, 0.0f, 0.0f }, {0.3f, 0.3f, 0.3f});
+		ParticleModel* pm = new ParticleModel(t, true, { -2.0f + static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2.0 - -2.0)),
+			-1.0f,
+			-2.0f + static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2.0 - -2.0)) }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f });
 			
-			particles.push_back(new Particle(t, pm, _particleApp));
-		}
+		particles.push_back(new Particle(t, pm, _particleApp));
+		
 	}
 
 	for (int i = 0; i < particles.size(); i++)

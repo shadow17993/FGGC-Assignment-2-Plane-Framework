@@ -142,7 +142,7 @@ HRESULT Application::Initialise(HINSTANCE hInstance, int nCmdShow)
 	_gameObjects.push_back(planeObj);
 	_gameObjects.push_back(terrainObj);
 
-	Transform * psTransform = new Transform(planeTransform);
+	Transform * psTransform = new Transform(planeTransform, {planeObj->GetTransform()->GetPosition()});
 
 	_ps = new ParticleSystem(psTransform, { 0.0f, 0.0f, 10.0f }, sphereAppearance);
 
@@ -717,7 +717,20 @@ void Application::getInput(float t)
 		}
 	}
 
-	eyePos = { cameraMain->GetLookAt().x, cameraMain->GetLookAt().y, cameraMain->GetLookAt().z };
+	cameraMain->SetPosition(_gameObjects.at(0)->GetTransform()->GetPosition().x,
+		_gameObjects.at(0)->GetTransform()->GetPosition().y + 15.0f,
+		_gameObjects.at(0)->GetTransform()->GetPosition().z + 50.0f);
+	cameraMain->SetLookAt(_gameObjects.at(0)->GetTransform()->GetPosition().x,
+		_gameObjects.at(0)->GetTransform()->GetPosition().y,
+		_gameObjects.at(0)->GetTransform()->GetPosition().z);
+	cameraMain->Update();
+	/*birdsEye->SetPosition(birdsEye->GetPosition().x, birdsEye->GetPosition().y - 0.1f, birdsEye->GetPosition().z);
+	birdsEye->SetLookAt(birdsEye->GetLookAt().x, birdsEye->GetLookAt().y - 0.1f, birdsEye->GetLookAt().z);
+	birdsEye->Update();
+	SideView->SetPosition(SideView->GetPosition().x, SideView->GetPosition().y - 0.1f, SideView->GetPosition().z);
+	SideView->SetLookAt(SideView->GetLookAt().x, SideView->GetLookAt().y - 0.1f, SideView->GetLookAt().z);
+	SideView->Update();*/
+
 	
 }
 
@@ -789,7 +802,7 @@ void Application::Draw()
 	cb.World = XMMatrixIdentity();
 	_pImmediateContext->UpdateSubresource(_pConstantBuffer, 0, nullptr, &cb, 0, 0);
 
-	_ps->Draw(_pImmediateContext);
+	//_ps->Draw(_pImmediateContext);
 
 	for (auto particles : _ps->getParticles())
 	{

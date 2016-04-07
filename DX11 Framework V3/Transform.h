@@ -14,6 +14,7 @@ public:
 	~Transform();
 
 	void SetParent(Transform * parent) { _parent = parent; }
+	Transform* getParent(){ return _parent; }
 
 	XMMATRIX GetWorldMatrix() const { return XMLoadFloat4x4(&_world); }
 
